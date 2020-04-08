@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+
+        a {
+            text-decoration: none;
+        }
+
+        #container {
+            border: 1px solid black;
+            background-color:black;
+            font-family: 'Montserrat', sans-serif;
+            width: 300px;
+        }
+
+        #header {
+            font-weight: bolder;
+            color: ivory;
+            text-align: center;
+            margin: 10px 0px 10px 0px;
+        }
+
+        #song {
+            /* border: 1px solid green; */
+            /* margin: 10px 0px 10px 0px;  */
+            background-image: linear-gradient(to bottom, gray, black);
+            display: grid;
+            grid-column-gap: 5px;
+        }
+
+        #album {
+            width: fit-content;
+            margin: 5px;
+            grid-column: 1;
+            grid-row: 1/3;
+            /* border: 2px solid yellow; */
+        }
+
+        #artist {
+            color: ivory;
+            font-size: smaller;
+            font-weight: bold;
+            grid-row: 1;
+            grid-column: 2/4;
+            width: 200px;
+            margin: 0px;
+            display: flex;
+            align-items: flex-end;
+            /* border: 2px solid red; */
+        }
+
+        #title {
+            color: ivory;
+            font-size: smaller;
+            grid-row: 2;
+            grid-column: 2/4;
+            width: 200px;
+            margin: 0px;
+            vertical-align: top;
+            /* border: 2px solid green; */
+        }
+
+    </style>
+    <body>
+        <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+        <script>
+            
+            $.getJSON( "/history.json", function( data ) {
+               
+                var items = [];
+                $.each( data, function( key, val ) {
+                    if (key == "items") {
+                        val.forEach(GetSongInformation);                           
+                    }
+                });
+
+                function GetSongInformation(value, index, array) {
+                    console.log(Object.keys(value.track.album.artists[0]));
+                    var artist = {
+                        name: value.track.album.artists[0].name
+                    };
+                    var album = {
+                        name: value.track.album.name,
+                        cover640: value.track.album.images[0].url,
+                        cover300: value.track.album.images[1].url,
+                        cover64: value.track.album.images[2].url
+                    };
+                    var song = {
+                        name: value.track.name,
+                        url: value.track.external_urls.spotify
+                    };
+
+                    items.push("<a href='" + song.url + "' target='_blank'><div id='song'>" + 
+                        "<div id='album'><img src='" + album.cover64 + "'></div>" +
+                        "<div id='artist'>" + artist.name + "</div>" + 
+                        "<div id='title'>" + song.name + "</div>" +
+                        "</div></a>");
+                }
+                
+                $( "<div/>", {
+                    "id": "my-last-ten",
+                    html: items.join("")
+                }).appendTo("#songlist");
+                });
+        </script>
+
+        <div id="container">
+            <div id="header">Last 10 songs I've played on Spotify</div>
+            <div id="songlist"></div>
+        </div>
+    </body>
+</html>
